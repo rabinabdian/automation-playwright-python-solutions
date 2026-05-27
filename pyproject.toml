@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automation-playwright-python-solutions"
+version = "1.0.0"
+description = "Playwright Python automation testing portfolio"
+requires-python = ">=3.11"
+dependencies = [
+    "playwright>=1.40.0",
+    "pytest>=7.4.0",
+    "pytest-playwright>=0.4.4",
+    "pytest-html>=4.1.1",
+    "pytest-xdist>=3.5.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-v",
+    "--html=reports/report.html",
+    "--self-contained-html",
+    "--screenshot=only-on-failure",
+    "--video=retain-on-failure",
+    "--tracing=retain-on-failure",
+]
+markers = [
+    "e2e: end-to-end browser tests",
+    "api: API-level tests",
+    "data_driven: parametrized data-driven tests",
+    "smoke: critical path smoke suite",
+    "regression: full regression suite",
+]
