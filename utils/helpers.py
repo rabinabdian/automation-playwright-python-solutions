@@ -30,3 +30,38 @@ def wait_for_network_idle(page: Page, timeout: int = 5000) -> None:
 def checkout_info() -> dict[str, str]:
     """Return a standard set of checkout form values for tests."""
     return {"first_name": "Test", "last_name": "User", "postal_code": "12345"}
+
+
+def click_until_gone(
+    page: Page,
+    selector: str,
+    timeout: int = 5000,
+    max_clicks: int = 100,
+) -> int:
+    """
+    Click an element repeatedly until it is no longer visible.
+
+    Useful for "Show more" / "Load more" pagination buttons.
+    Returns the number of clicks performed.
+    Raises RuntimeError if the button is still present after max_clicks.
+    """
+    clicks = 0
+    locator = page.locator(selector)
+
+    while locator.is_visible():
+        if clicks >= max_clicks:
+            raise RuntimeError(
+                f"'{selector}' still visible after {max_clicks} clicks — "
+                "possible infinite loop, raise max_clicks if intentional."
+            )
+        locator.scroll_into_view_if_needed()
+        locator.click()
+        clicks += 1
+        # Wait for network activity triggered by the click to settle,
+        # then re-check visibility before the next iteration.
+        try:
+            page.wait_for_load_state("networkidle", timeout=timeout)
+        except Exception:
+            pass  # timeout is acceptable — element may already be gone
+
+    return clicks
